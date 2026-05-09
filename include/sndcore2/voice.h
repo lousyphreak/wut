@@ -17,10 +17,18 @@ extern "C" {
 typedef struct AXVoice AXVoice;
 typedef struct AXVoiceAdpcmLoopData AXVoiceAdpcmLoopData;
 typedef struct AXVoiceAdpcm AXVoiceAdpcm;
+typedef struct AXMultiVoice AXMultiVoice;
+typedef struct AXVoiceBiquadFilter AXVoiceBiquadFilter;
+typedef struct AXVoiceDRCMixData AXVoiceDRCMixData;
 typedef struct AXVoiceDeviceBusMixData AXVoiceDeviceBusMixData;
 typedef struct AXVoiceDeviceMixData AXVoiceDeviceMixData;
 typedef struct AXVoiceLink AXVoiceLink;
+typedef struct AXVoiceLowPassFilter AXVoiceLowPassFilter;
+typedef struct AXVoiceMixData AXVoiceMixData;
 typedef struct AXVoiceOffsets AXVoiceOffsets;
+typedef union AXVoiceRemoteIIRFilter AXVoiceRemoteIIRFilter;
+typedef struct AXVoiceRemoteMixData AXVoiceRemoteMixData;
+typedef struct AXVoiceRemoteSrc AXVoiceRemoteSrc;
 typedef struct AXVoiceSrc AXVoiceSrc;
 typedef struct AXVoiceVeData AXVoiceVeData;
 
@@ -44,6 +52,9 @@ typedef int32_t AXVoiceSrcRatioResult;
 
 //! A value from enum AX_VOICE_TYPE.
 typedef uint32_t AXVoiceType;
+
+//! A value from enum AX_BUS_TYPE.
+typedef uint32_t AXBusType;
 
 typedef void (*AXVoiceCallbackFn)(void *);
 typedef void (*AXVoiceCallbackExFn)(void *, uint32_t, uint32_t);
@@ -77,11 +88,11 @@ enum AX_VOICE_RATIO_RESULT
 
 enum AX_VOICE_SRC_TYPE
 {
-   AX_VOICE_SRC_TYPE_NONE   = 0,
-   AX_VOICE_SRC_TYPE_LINEAR = 1,
-   AX_VOICE_SRC_TYPE_UNK0   = 2,
-   AX_VOICE_SRC_TYPE_UNK1   = 3,
-   AX_VOICE_SRC_TYPE_UNK2   = 4,
+   AX_VOICE_SRC_TYPE_POLYPHASE = 0,
+   AX_VOICE_SRC_TYPE_LINEAR    = 1,
+   AX_VOICE_SRC_TYPE_NONE      = 2,
+   AX_VOICE_SRC_TYPE_UNK3      = 3,
+   AX_VOICE_SRC_TYPE_UNK4      = 4,
 };
 
 enum AX_VOICE_STATE
@@ -92,8 +103,16 @@ enum AX_VOICE_STATE
 
 enum AX_VOICE_TYPE
 {
-   // Unknown
-   AX_VOICE_TYPE_UNKNOWN
+   AX_VOICE_TYPE_NORMAL = 0,
+   AX_VOICE_TYPE_STREAM = 1,
+};
+
+enum AX_BUS_TYPE
+{
+   AX_BUS_TYPE_MAIN  = 0,
+   AX_BUS_TYPE_AUX_A = 1,
+   AX_BUS_TYPE_AUX_B = 2,
+   AX_BUS_TYPE_AUX_C = 3,
 };
 
 struct AXVoiceLink
@@ -232,6 +251,51 @@ WUT_CHECK_OFFSET(AXVoiceAdpcm, 0x22, predScale);
 WUT_CHECK_OFFSET(AXVoiceAdpcm, 0x24, prevSample);
 WUT_CHECK_SIZE(AXVoiceAdpcm, 0x28);
 
+struct AXVoiceLowPassFilter
+{
+   uint16_t enabled;
+   int16_t previousSample;
+   uint16_t a0;
+   uint16_t b0;
+};
+WUT_CHECK_OFFSET(AXVoiceLowPassFilter, 0x0, enabled);
+WUT_CHECK_OFFSET(AXVoiceLowPassFilter, 0x2, previousSample);
+WUT_CHECK_OFFSET(AXVoiceLowPassFilter, 0x4, a0);
+WUT_CHECK_OFFSET(AXVoiceLowPassFilter, 0x6, b0);
+WUT_CHECK_SIZE(AXVoiceLowPassFilter, 0x8);
+
+struct AXVoiceBiquadFilter
+{
+   uint16_t enabled;
+   int16_t previousInput0;
+   int16_t previousInput1;
+   int16_t previousOutput0;
+   int16_t previousOutput1;
+   int16_t b0;
+   int16_t b1;
+   int16_t b2;
+   int16_t a1;
+   int16_t a2;
+};
+WUT_CHECK_OFFSET(AXVoiceBiquadFilter, 0x0, enabled);
+WUT_CHECK_OFFSET(AXVoiceBiquadFilter, 0x2, previousInput0);
+WUT_CHECK_OFFSET(AXVoiceBiquadFilter, 0x4, previousInput1);
+WUT_CHECK_OFFSET(AXVoiceBiquadFilter, 0x6, previousOutput0);
+WUT_CHECK_OFFSET(AXVoiceBiquadFilter, 0x8, previousOutput1);
+WUT_CHECK_OFFSET(AXVoiceBiquadFilter, 0xA, b0);
+WUT_CHECK_OFFSET(AXVoiceBiquadFilter, 0xC, b1);
+WUT_CHECK_OFFSET(AXVoiceBiquadFilter, 0xE, b2);
+WUT_CHECK_OFFSET(AXVoiceBiquadFilter, 0x10, a1);
+WUT_CHECK_OFFSET(AXVoiceBiquadFilter, 0x12, a2);
+WUT_CHECK_SIZE(AXVoiceBiquadFilter, 0x14);
+
+union AXVoiceRemoteIIRFilter
+{
+   AXVoiceLowPassFilter lpf;
+   AXVoiceBiquadFilter biquad;
+};
+WUT_CHECK_SIZE(AXVoiceRemoteIIRFilter, 0x14);
+
 #pragma pack(push, 1)
 
 /**
@@ -251,7 +315,94 @@ WUT_CHECK_OFFSET(AXVoiceSrc, 0x4, currentOffsetFrac);
 WUT_CHECK_OFFSET(AXVoiceSrc, 0x6, lastSample);
 WUT_CHECK_SIZE(AXVoiceSrc, 0xe);
 
+struct AXVoiceRemoteSrc
+{
+   uint16_t currentOffsetFrac;
+   int16_t lastSample[4];
+};
+WUT_CHECK_OFFSET(AXVoiceRemoteSrc, 0x0, currentOffsetFrac);
+WUT_CHECK_OFFSET(AXVoiceRemoteSrc, 0x2, lastSample);
+WUT_CHECK_SIZE(AXVoiceRemoteSrc, 0x0A);
+
 #pragma pack(pop)
+
+struct AXVoiceMixData
+{
+   uint16_t left;
+   int16_t leftDelta;
+   uint16_t right;
+   int16_t rightDelta;
+   uint16_t auxALeft;
+   int16_t auxALeftDelta;
+   uint16_t auxARight;
+   int16_t auxARightDelta;
+   uint16_t auxBLeft;
+   int16_t auxBLeftDelta;
+   uint16_t auxBRight;
+   int16_t auxBRightDelta;
+   uint16_t auxCLeft;
+   int16_t auxCLeftDelta;
+   uint16_t auxCRight;
+   int16_t auxCRightDelta;
+   uint16_t surround;
+   int16_t surroundDelta;
+   uint16_t auxASurround;
+   int16_t auxASurroundDelta;
+   uint16_t auxBSurround;
+   int16_t auxBSurroundDelta;
+   uint16_t auxCSurround;
+   int16_t auxCSurroundDelta;
+};
+WUT_CHECK_SIZE(AXVoiceMixData, 0x30);
+
+struct AXVoiceDRCMixData
+{
+   uint16_t left;
+   int16_t leftDelta;
+   uint16_t right;
+   int16_t rightDelta;
+   uint16_t auxLeft;
+   int16_t auxLeftDelta;
+   uint16_t auxRight;
+   int16_t auxRightDelta;
+   uint16_t surround;
+   int16_t surroundDelta;
+   uint16_t auxSurround;
+   int16_t auxSurroundDelta;
+};
+WUT_CHECK_SIZE(AXVoiceDRCMixData, 0x18);
+
+struct AXVoiceRemoteMixData
+{
+   uint16_t main0;
+   int16_t main0Delta;
+   uint16_t aux0;
+   int16_t aux0Delta;
+   uint16_t main1;
+   int16_t main1Delta;
+   uint16_t aux1;
+   int16_t aux1Delta;
+   uint16_t main2;
+   int16_t main2Delta;
+   uint16_t aux2;
+   int16_t aux2Delta;
+   uint16_t main3;
+   int16_t main3Delta;
+   uint16_t aux3;
+   int16_t aux3Delta;
+};
+WUT_CHECK_SIZE(AXVoiceRemoteMixData, 0x20);
+
+struct AXMultiVoice
+{
+   BOOL active;
+   uint32_t count;
+   AXVoice *voices[6];
+};
+WUT_CHECK_OFFSET(AXMultiVoice, 0x0, active);
+WUT_CHECK_OFFSET(AXMultiVoice, 0x4, count);
+WUT_CHECK_OFFSET(AXMultiVoice, 0x8, voices);
+WUT_CHECK_SIZE(AXMultiVoice, 0x20);
 
 int32_t
 AXVoiceBegin(AXVoice *v);
@@ -296,6 +447,10 @@ BOOL
 AXIsVoiceRunning(AXVoice *voice);
 
 void
+AXSetVoiceSamplesAddr(AXVoice *voice,
+                      const void *samples);
+
+void
 AXSetVoiceAdpcm(AXVoice *voice,
                 AXVoiceAdpcm *adpcm);
 
@@ -307,11 +462,24 @@ void
 AXSetVoiceCurrentOffset(AXVoice *voice,
                         uint32_t offset);
 
+void
+AXSetVoiceCurrentOffsetEx(AXVoice *voice,
+                          uint32_t offset,
+                          const void *samples);
+
 AXResult
 AXSetVoiceDeviceMix(AXVoice *voice,
                     AXDeviceType type,
                     uint32_t id,
                     AXVoiceDeviceMixData *mixData);
+
+void
+AXSetVoiceMix(AXVoice *voice,
+              const AXVoiceMixData *mixData);
+
+void
+AXSetVoiceDRCMix(AXVoice *voice,
+                 const AXVoiceDRCMixData *mixData);
 
 void
 AXSetVoiceEndOffset(AXVoice *voice,
@@ -340,17 +508,68 @@ AXSetVoiceLoop(AXVoice *voice,
                AXVoiceLoop loop);
 
 void
+AXGetVoiceOffsetsEx(AXVoice *voice,
+                    AXVoiceOffsets *offsets,
+                    const void *samples);
+
+void
 AXSetVoiceOffsets(AXVoice *voice,
                   AXVoiceOffsets *offsets);
+
+void
+AXSetVoiceOffsetsEx(AXVoice *voice,
+                    const AXVoiceOffsets *offsets,
+                    const void *samples);
 
 void
 AXSetVoicePriority(AXVoice *voice,
                    uint32_t priority);
 
 void
+AXSetVoiceItdOn(AXVoice *voice);
+
+void
+AXSetVoiceItdTarget(AXVoice *voice,
+                    uint16_t leftShift,
+                    uint16_t rightShift);
+
+void
+AXSetVoiceLpf(AXVoice *voice,
+              const AXVoiceLowPassFilter *filter);
+
+void
+AXSetVoiceLpfCoefs(AXVoice *voice,
+                   uint16_t a0,
+                   uint16_t b0);
+
+void
+AXSetVoiceBiquad(AXVoice *voice,
+                 const AXVoiceBiquadFilter *filter);
+
+void
+AXSetVoiceBiquadCoefs(AXVoice *voice,
+                      uint16_t b0,
+                      uint16_t b1,
+                      uint16_t b2,
+                      uint16_t a1,
+                      uint16_t a2);
+
+void
 AXSetVoiceRmtIIRCoefs(AXVoice *voice,
                       uint16_t filter,
                       ...);
+
+void
+AXSetVoiceRmtIIR(AXVoice *voice,
+                 const AXVoiceRemoteIIRFilter *filter);
+
+void
+AXSetVoiceRmtMix(AXVoice *voice,
+                 const AXVoiceRemoteMixData *mixData);
+
+void
+AXSetVoiceRmtSrc(AXVoice *voice,
+                 const AXVoiceRemoteSrc *src);
 
 void
 AXSetVoiceSrc(AXVoice *voice,
@@ -389,6 +608,134 @@ AXSetVoiceVeDelta(AXVoice *voice,
  */
 void
 AXSetVoiceRmtOn(AXVoice *voice, uint16_t on);
+
+void
+AXComputeLpfCoefs(uint16_t frequency,
+                  uint16_t *a0,
+                  uint16_t *b0);
+
+void
+AXPrepareEfxData(const void *samples,
+                 uint32_t size);
+
+AXResult
+AXAcquireMultiVoice(uint32_t priority,
+                    AXVoiceCallbackExFn callback,
+                    void *userContext,
+                    AXVoiceAdpcm *adpcm,
+                    AXMultiVoice **outVoice);
+
+void
+AXFreeMultiVoice(AXMultiVoice *voice);
+
+void
+AXSetMultiVoicePriority(AXMultiVoice *voice,
+                        uint32_t priority);
+
+void
+AXSetMultiVoiceSrcType(AXMultiVoice *voice,
+                       AXVoiceSrcType type);
+
+void
+AXSetMultiVoiceState(AXMultiVoice *voice,
+                     AXVoiceState state);
+
+void
+AXSetMultiVoiceType(AXMultiVoice *voice,
+                    AXVoiceType type);
+
+void
+AXSetMultiVoiceVe(AXMultiVoice *voice,
+                  const AXVoiceVeData *veData);
+
+void
+AXSetMultiVoiceVeDelta(AXMultiVoice *voice,
+                       int16_t delta);
+
+void
+AXSetMultiVoiceOffsets(AXMultiVoice *voice,
+                       AXVoiceOffsets *offsets);
+
+void
+AXSetMultiVoiceLoop(AXMultiVoice *voice,
+                    AXVoiceLoop loop);
+
+void
+AXSetMultiVoiceAdpcm(AXMultiVoice *voice,
+                     AXVoiceAdpcm *adpcm);
+
+void
+AXSetMultiVoiceSrc(AXMultiVoice *voice,
+                   const AXVoiceSrc *src);
+
+AXVoiceSrcRatioResult
+AXSetMultiVoiceSrcRatio(AXMultiVoice *voice,
+                        float ratio);
+
+void
+AXSetMultiVoiceAdpcmLoop(AXMultiVoice *voice,
+                         AXVoiceAdpcmLoopData *loopData);
+
+void
+AXSetMultiVoiceLpf(AXMultiVoice *voice,
+                   const AXVoiceLowPassFilter *filter);
+
+void
+AXSetMultiVoiceLpfCoefs(AXMultiVoice *voice,
+                        uint16_t a0,
+                        uint16_t b0);
+
+void
+AXSetMultiVoiceBiquad(AXMultiVoice *voice,
+                      const AXVoiceBiquadFilter *filter);
+
+void
+AXSetMultiVoiceBiquadCoefs(AXMultiVoice *voice,
+                           uint16_t b0,
+                           uint16_t b1,
+                           uint16_t b2,
+                           uint16_t a1,
+                           uint16_t a2);
+
+AXVoiceRenderer
+AXSetMultiVoiceRenderer(AXMultiVoice *voice,
+                        AXVoiceRenderer renderer);
+
+AXVoiceRenderer
+AXGetMultiVoiceRenderer(AXMultiVoice *voice);
+
+void
+AXSetMultiVoiceLoopOffset(AXMultiVoice *voice,
+                          uint32_t offset);
+
+void
+AXSetMultiVoiceEndOffset(AXMultiVoice *voice,
+                         uint32_t offset);
+
+void
+AXSetMultiVoiceCurrentOffset(AXMultiVoice *voice,
+                             uint32_t offset);
+
+void
+AXGetMultiVoiceOffsets(AXMultiVoice *voice,
+                       AXVoiceOffsets *offsets);
+
+BOOL
+AXIsMultiVoiceRunning(AXMultiVoice *voice);
+
+AXResult
+AXSetMultiVoiceDeviceMix(AXMultiVoice *voice,
+                         AXDeviceType type,
+                         uint32_t id,
+                         AXBusType bus,
+                         uint16_t volume,
+                         int16_t delta);
+
+AXResult
+AXGetMultiVoiceReformatBufferSize(AXVoiceFormat format,
+                                  uint32_t numChannels,
+                                  uint32_t numBytes,
+                                  uint32_t *size);
 
 #ifdef __cplusplus
 }

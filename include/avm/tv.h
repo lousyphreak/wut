@@ -42,6 +42,12 @@ typedef enum AVMTvVideoRegion
    AVM_TV_VIDEO_REGION_PAL,
 } AVMTvVideoRegion;
 
+//! Thin public recovery of AVM's TV audio-mode state.
+typedef uint32_t AVMTvAudioMode;
+
+//! Thin public recovery of AVM's hotplug state.
+typedef uint32_t AVMHotplugState;
+
 /**
  * Gets the TV video region.
  *
@@ -79,6 +85,12 @@ AVMGetCurrentPort(TVEPort *outPort);
 void
 AVMGetHDMIState(TVEHdmiState *outState);
 
+BOOL
+AVMGetAudioHDMIOutStatus(BOOL *outEnabled);
+
+BOOL
+AVMGetAudioMaxChannel(uint32_t *outMaxChannels);
+
 /**
  * Gets the TV aspect ratio.
  * 
@@ -90,6 +102,15 @@ AVMGetHDMIState(TVEHdmiState *outState);
  */
 BOOL
 AVMGetTVAspectRatio(AVMTvAspectRatio *outAspectRatio);
+
+BOOL
+AVMGetTVAudioMode(AVMTvAudioMode *outAudioMode);
+
+BOOL
+AVMGetTVAudioChannel(uint32_t *outChannels);
+
+BOOL
+AVMGetTVAudioMute(BOOL *outMuted);
 
 /**
  * Gets the TV resolution.
@@ -139,6 +160,9 @@ AVMGetTVUnderScan(uint32_t *outUnderScan);
  */
 BOOL
 AVMIsAVOutReady(void);
+
+BOOL
+AVMGetHotplugState(AVMHotplugState *outState);
 
 /**
  * Sets the TV aspect ratio.

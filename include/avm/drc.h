@@ -33,6 +33,9 @@ typedef enum AVMDrcSystemAudioMode
    AVM_DRC_SYSTEM_AUDIO_MODE_SURROUND  = 2,
 } AVMDrcSystemAudioMode;
 
+//! Thin public recovery of AVM's DRC audio-mode state.
+typedef uint32_t AVMDrcAudioMode;
+
 /**
  * Uses AVMGetDRCSystemAudioMode internally
  * @param outAudioMode
@@ -43,6 +46,24 @@ AVMGetSystemDRCAudioMode(AVMDrcSystemAudioMode *outAudioMode);
 
 BOOL
 AVMGetDRCSystemAudioMode(AVMDrcSystemAudioMode *outAudioMode);
+
+BOOL
+AVMGetDRCAudioMode(AVMDrcAudioMode *outAudioMode);
+
+BOOL
+AVMSetDRCAudioMode(AVMDrcAudioMode audioMode);
+
+BOOL
+AVMGetDRCAutoMicSelectionEnable(BOOL *outEnabled);
+
+BOOL
+AVMSetDRCAutoMicSelectionEnable(BOOL enabled);
+
+int32_t
+AVMDRCMicOpen(void);
+
+int32_t
+AVMDRCMicClose(void);
 
 uint32_t
 AVMGetDRCVertCount();

@@ -3,6 +3,7 @@
 :TEXT
 ProcUICalcMemorySize
 ProcUIClearCallbacks
+ProcUIClearExitCallbacks
 ProcUIDrawDoneRelease
 ProcUIInForeground
 ProcUIInShutdown

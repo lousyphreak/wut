@@ -125,6 +125,19 @@ int32_t
 VPADBASEGetHeadphoneStatus(VPADChan chan);
 
 /**
+ * Get the microphone status.
+ *
+ * \note
+ * Retail Wii U systems have a single Gamepad on \link VPADChan::VPAD_CHAN_0
+ * VPAD_CHAN_0. \endlink
+ *
+ * \returns
+ * Returns a non-zero value when the GamePad microphone path is available.
+ */
+int32_t
+VPADBASEGetMicStatus(VPADChan chan);
+
+/**
  * Get the controller mode.
  *
  * \note

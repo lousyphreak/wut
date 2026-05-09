@@ -20,12 +20,19 @@ typedef struct AXTransitionAudioBuffer AXTransitionAudioBuffer;
 typedef struct AXTransitionAudioBufferDevice AXTransitionAudioBufferDevice;
 
 typedef void (*AXFrameCallback)(void);
+typedef void (*AXExceedCallback)(uint32_t cycles);
 
 //! A value from enum AX_INIT_RENDERER.
 typedef uint32_t AXInitRenderer;
 
+//! A value from enum AX_INIT_FRAME_SIZE.
+typedef uint32_t AXInitFrameSize;
+
 //! A value from enum AX_INIT_PIPELINE.
 typedef uint32_t AXInitPipeline;
+
+//! A value from enum AX_INIT_ERROR.
+typedef int32_t AXInitError;
 
 enum AX_INIT_RENDERER
 {
@@ -33,10 +40,24 @@ enum AX_INIT_RENDERER
    AX_INIT_RENDERER_48KHZ = 1,
 };
 
+enum AX_INIT_FRAME_SIZE
+{
+   AX_INIT_FRAME_SIZE_3MS = 0,
+};
+
 enum AX_INIT_PIPELINE
 {
    AX_INIT_PIPELINE_SINGLE     = 0,
    AX_INIT_PIPELINE_FOUR_STAGE = 1,
+};
+
+enum AX_INIT_ERROR
+{
+   AX_INIT_ERROR_OK                  = 0,
+   AX_INIT_ERROR_ALREADY_INITIALIZED = -1,
+   AX_INIT_ERROR_INVALID_RENDERER    = -2,
+   AX_INIT_ERROR_INVALID_FRAME_SIZE  = -3,
+   AX_INIT_ERROR_INVALID_PIPELINE    = -4,
 };
 
 struct AXProfile
@@ -47,10 +68,11 @@ struct AXProfile
 struct AXInitParams
 {
    AXInitRenderer renderer;
-   WUT_UNKNOWN_BYTES(4);
+   AXInitFrameSize frameSize;
    AXInitPipeline pipeline;
 };
 WUT_CHECK_OFFSET(AXInitParams, 0x00, renderer);
+WUT_CHECK_OFFSET(AXInitParams, 0x04, frameSize);
 WUT_CHECK_OFFSET(AXInitParams, 0x08, pipeline);
 WUT_CHECK_SIZE(AXInitParams, 0x0C);
 
@@ -92,11 +114,14 @@ AXInit();
 void
 AXQuit();
 
-void
+AXInitError
 AXInitWithParams(AXInitParams *params);
 
 BOOL
 AXIsInit();
+
+BOOL
+AXIsAudioOutReady();
 
 void
 AXInitProfile(AXProfile *profile,
@@ -118,17 +143,50 @@ AXDeregisterAppFrameCallback(AXFrameCallback callback);
 AXFrameCallback
 AXRegisterFrameCallback(AXFrameCallback callback);
 
+void
+AXRegisterExceedCallback(AXExceedCallback callback);
+
+void
+AXGetCurrentParams(AXInitParams *params);
+
+AXInitRenderer
+AXGetRendererFreq();
+
 uint32_t
 AXGetInputSamplesPerFrame();
 
 uint32_t
 AXGetInputSamplesPerSec();
 
+uint32_t
+AXGetLibraryVersion();
+
+uint16_t
+AXGetMasterVolume();
+
+void
+AXSetMasterVolume(uint16_t volume);
+
+uint16_t
+AXGetMasterDRCVolume();
+
+void
+AXSetMasterDRCVolume(uint16_t volume);
+
+uint16_t
+AXGetDRCAuxReturnVolume();
+
+void
+AXSetDRCAuxReturnVolume(uint16_t volume);
+
 void
 AXStartTransitionAudio();
 
 void
 AXSetUpTransitionAudio(AXTransitionAudioBuffer *buffer);
+
+BOOL
+AXIsTransitionAudioDone();
 
 #ifdef __cplusplus
 }

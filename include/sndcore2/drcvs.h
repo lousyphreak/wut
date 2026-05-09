@@ -30,32 +30,35 @@ typedef uint32_t AXDRCVSSurroundLevelGain;
 
 enum AX_DRC_VS_MODE
 {
-   // Unknown
-   AX_DRC_VS_MODE_UNKNOWN
+   AX_DRC_VS_MODE_OFF             = 0,
+   AX_DRC_VS_MODE_ON_NORMAL       = 1,
+   AX_DRC_VS_MODE_ON_FRONT_BYPASS = 2,
 };
 
 enum AX_DRC_VS_OUTPUT
 {
-   // Unknown
-   AX_DRC_VS_OUTPUT_UNKNOWN
+   AX_DRC_VS_OUTPUT_SPEAKER   = 0,
+   AX_DRC_VS_OUTPUT_HEADPHONE = 1,
 };
 
 enum AX_DRC_VS_LC
 {
-   // Unknown
-   AX_DRC_VS_LC_UNKNOWN
+   AX_DRC_VS_LC_NOT_USE = 0,
+   AX_DRC_VS_LC_USE     = 1,
+   AX_DRC_VS_LC_USE_MAX = 2,
 };
 
 enum AX_DRC_VS_SPEAKER_POS
 {
-   // Unknown
-   AX_DRC_VS_SPEAKER_POS_UNKNOWN
+   AX_DRC_VS_SPEAKER_POS_WIDE   = 0,
+   AX_DRC_VS_SPEAKER_POS_SQUARE = 1,
 };
 
 enum AX_DRC_VS_SURROUND_GAIN
 {
-   // Unknown
-   AX_DRC_VS_SURROUND_GAIN_UNKNOWN
+   AX_DRC_VS_SURROUND_GAIN_1_0   = 0,
+   AX_DRC_VS_SURROUND_GAIN_0_707 = 1,
+   AX_DRC_VS_SURROUND_GAIN_0_5   = 2,
 };
 
 AXResult
