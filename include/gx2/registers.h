@@ -502,6 +502,12 @@ GX2GetPolygonControlReg(GX2PolygonControlReg *reg,
 void
 GX2SetPolygonControlReg(const GX2PolygonControlReg *reg);
 
+/**
+ * Set constant and slope-scaled depth bias for each polygon face.
+ * Polygon-offset enables are controlled separately by GX2SetPolygonControl.
+ * A positive clamp bounds the offset above, a negative clamp bounds it below,
+ * and zero disables the clamp.
+ */
 void
 GX2SetPolygonOffset(float frontOffset,
                     float frontScale,
@@ -619,6 +625,7 @@ void
 GX2SetRasterizerClipControl(BOOL rasterizer,
                             BOOL zclipEnable);
 
+/** Control near/far Z clipping and choose [0,1] (halfZ) or [-1,1] clip space. */
 void
 GX2SetRasterizerClipControlEx(BOOL rasterizer,
                               BOOL zclipEnable,

@@ -11,20 +11,27 @@
 extern "C" {
 #endif
 
-#define GX2_FALSE                    (0)
-#define GX2_TRUE                     (1)
-#define GX2_DISABLE                  (0)
-#define GX2_ENABLE                   (1)
+#define GX2_FALSE                     (0)
+#define GX2_TRUE                      (1)
+#define GX2_DISABLE                   (0)
+#define GX2_ENABLE                    (1)
 
-#define GX2_COMMAND_BUFFER_ALIGNMENT (0x40)
-#define GX2_CONTEXT_STATE_ALIGNMENT  (0x100)
-#define GX2_SCAN_BUFFER_ALIGNMENT    (0x1000)
-#define GX2_SHADER_PROGRAM_ALIGNMENT (0x100)
-#define GX2_VERTEX_BUFFER_ALIGNMENT  (0x40)
-#define GX2_INDEX_BUFFER_ALIGNMENT   (0x20)
-#define GX2_UNIFORM_BLOCK_ALIGNMENT  (0x100)
+#define GX2_COMMAND_BUFFER_ALIGNMENT  (0x40)
+#define GX2_CONTEXT_STATE_ALIGNMENT   (0x100)
+#define GX2_SCAN_BUFFER_ALIGNMENT     (0x1000)
+#define GX2_SHADER_PROGRAM_ALIGNMENT  (0x100)
+#define GX2_VERTEX_BUFFER_ALIGNMENT   (0x40)
+#define GX2_INDEX_BUFFER_ALIGNMENT    (0x20)
+#define GX2_UNIFORM_BLOCK_ALIGNMENT   (0x100)
 
-#define GX2_COMMAND_BUFFER_SIZE      (0x400000)
+#define GX2_COMMAND_BUFFER_SIZE       (0x400000)
+
+#define GX2_MAX_TEXTURE_WIDTH         (8192)
+#define GX2_MAX_TEXTURE_HEIGHT        (8192)
+#define GX2_MAX_TEXTURE_DEPTH         (8192)
+#define GX2_MAX_RENDER_TARGETS        (8)
+#define GX2_MAX_COPY_SURFACE_EX_RECTS (25)
+#define GX2_AUX_BUFFER_CLEAR_VALUE    (0xCC)
 
 typedef enum GX2AAMode
 {
@@ -309,6 +316,14 @@ typedef enum GX2PolygonMode
    GX2_POLYGON_MODE_LINE     = 1,
    GX2_POLYGON_MODE_TRIANGLE = 2,
 } GX2PolygonMode;
+
+typedef enum GX2QueryType
+{
+   GX2_QUERY_TYPE_OCCLUSION_CPU        = 0,
+   GX2_QUERY_TYPE_STREAM_OUT_STATS_CPU = 1,
+   GX2_QUERY_TYPE_OCCLUSION_GPU        = 2,
+   GX2_QUERY_TYPE_STREAM_OUT_STATS_GPU = 3,
+} GX2QueryType;
 
 typedef enum GX2RenderTarget
 {

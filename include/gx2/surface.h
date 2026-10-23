@@ -41,6 +41,12 @@ struct GX2Surface
    uint32_t swizzle;
    uint32_t alignment;
    uint32_t pitch;
+   /**
+    * Byte offsets calculated by GX2CalcSurfaceSizeAndAlignment.
+    * Level 0 starts at image; level 1 starts at mipmaps; levels 2 and above
+    * start at mipmaps + mipLevelOffset[level - 1].
+    * Entry 0 only gives the padded spacing for placing mipmaps after image.
+    */
    uint32_t mipLevelOffset[13];
 };
 WUT_CHECK_OFFSET(GX2Surface, 0x0, dim);
@@ -107,6 +113,7 @@ WUT_CHECK_OFFSET(GX2ColorBuffer, 0x84, aaSize);
 WUT_CHECK_OFFSET(GX2ColorBuffer, 0x88, regs);
 WUT_CHECK_SIZE(GX2ColorBuffer, 0x9C);
 
+/** Pixel rectangle with inclusive left/top and exclusive right/bottom. */
 struct GX2Rect
 {
    int32_t left;
@@ -159,6 +166,20 @@ void
 GX2InitDepthBufferHiZEnable(GX2DepthBuffer *depthBuffer,
                             BOOL enable);
 
+/** Set AA mode explicitly, including when rendering without color target 0. */
+void
+GX2SetAAMode(GX2AAMode aa);
+
+/** Pitch in pixels, or in 4x4 blocks for block-compressed formats. */
+uint32_t
+GX2GetSurfaceMipPitch(GX2Surface *surface,
+                      uint32_t mipLevel);
+
+/** Padded byte size of one 2D slice at the requested mip level. */
+uint32_t
+GX2GetSurfaceMipSliceSize(GX2Surface *surface,
+                          uint32_t mipLevel);
+
 uint32_t
 GX2GetSurfaceSwizzle(const GX2Surface *surface);
 
@@ -174,6 +195,12 @@ GX2CopySurface(const GX2Surface *src,
                uint32_t dstLevel,
                uint32_t dstDepth);
 
+/**
+ * Copy up to GX2_MAX_COPY_SURFACE_EX_RECTS rectangles within one mip/slice.
+ * Coordinates are mip-relative pixels, including for compressed formats,
+ * which require 4x4 pixel alignment. Formats must match; no stretching or
+ * LINEAR_SPECIAL surfaces are supported. Restore context state afterward.
+ */
 void
 GX2CopySurfaceEx(const GX2Surface *src,
                  uint32_t srcLevel,
@@ -190,6 +217,36 @@ GX2ResolveAAColorBuffer(const GX2ColorBuffer *srcColorBuffer,
                         GX2Surface *dstSurface,
                         uint32_t dstMip,
                         uint32_t dstSlice);
+
+/**
+ * Expand the selected mip/slices in place for multisample texture sampling.
+ * Modifies color and auxiliary storage. Rendering makes expansion necessary
+ * again. Not required before resolve. Restore context state afterward.
+ */
+void
+GX2ExpandAAColorBuffer(GX2ColorBuffer *colorBuffer);
+
+/**
+ * Expand Hi-Z in place for texture-compatible, single-sample depth formats.
+ * Modifies depth and Hi-Z storage. Rendering makes expansion necessary again.
+ * D24S8 and multisample depth need conversion instead. Restore context state
+ * afterward.
+ */
+void
+GX2ExpandDepthBuffer(GX2DepthBuffer *depthBuffer);
+
+/**
+ * Convert depth tiling to texture/color tiling, preserving sample count.
+ * Copies viewNumSlices from viewFirstSlice at viewMip into dstMip/dstSlice.
+ * Destination use must exclude DEPTH_BUFFER. In-place conversion requires
+ * matching tile modes and ends depth-buffer use of that storage.
+ * Restore context state afterward.
+ */
+void
+GX2ConvertDepthBufferToTextureSurface(const GX2DepthBuffer *srcDepthBuffer,
+                                      GX2Surface *dstSurface,
+                                      uint32_t dstMip,
+                                      uint32_t dstSlice);
 
 #ifdef __cplusplus
 }

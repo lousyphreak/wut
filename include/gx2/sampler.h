@@ -71,6 +71,32 @@ GX2InitSamplerZMFilter(GX2Sampler *sampler,
                        GX2TexZFilterMode filterZ,
                        GX2TexMipFilterMode filterMip);
 
+/**
+ * Set a stage's sampler-unit border color for GX2_TEX_BORDER_TYPE_VARIABLE.
+ * Components range from 0.0 to 1.0. These setters stall the graphics pipeline;
+ * avoid setting an unchanged border color again.
+ */
+void
+GX2SetVertexSamplerBorderColor(uint32_t unit,
+                               float red,
+                               float green,
+                               float blue,
+                               float alpha);
+
+void
+GX2SetPixelSamplerBorderColor(uint32_t unit,
+                              float red,
+                              float green,
+                              float blue,
+                              float alpha);
+
+void
+GX2SetGeometrySamplerBorderColor(uint32_t unit,
+                                 float red,
+                                 float green,
+                                 float blue,
+                                 float alpha);
+
 #ifdef __cplusplus
 }
 #endif
