@@ -97,6 +97,13 @@ GX2SetGeometrySamplerBorderColor(uint32_t unit,
                                  float blue,
                                  float alpha);
 
+void
+GX2SetComputeSamplerBorderColor(uint32_t unit,
+                                float red,
+                                float green,
+                                float blue,
+                                float alpha);
+
 #ifdef __cplusplus
 }
 #endif

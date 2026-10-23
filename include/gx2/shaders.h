@@ -17,6 +17,8 @@ extern "C" {
 
 typedef struct GX2AttribVar GX2AttribVar;
 typedef struct GX2AttribStream GX2AttribStream;
+typedef struct GX2ComputeShader GX2ComputeShader;
+typedef struct GX2DispatchParams GX2DispatchParams;
 typedef struct GX2FetchShader GX2FetchShader;
 typedef struct GX2GeometryShader GX2GeometryShader;
 typedef struct GX2LoopVar GX2LoopVar;
@@ -26,6 +28,24 @@ typedef struct GX2UniformBlock GX2UniformBlock;
 typedef struct GX2UniformVar GX2UniformVar;
 typedef struct GX2UniformInitialValue GX2UniformInitialValue;
 typedef struct GX2VertexShader GX2VertexShader;
+
+/**
+ * GPU-read dispatch dimensions, stored in native PowerPC (big-endian) order.
+ * Allocate at GX2_DISPATCH_PARAMS_ALIGNMENT and publish CPU writes with
+ * GX2Invalidate before dispatch. Keep unchanged until GPU completion.
+ */
+struct GX2DispatchParams
+{
+   uint32_t groupCountX;
+   uint32_t groupCountY;
+   uint32_t groupCountZ;
+   uint32_t padding;
+};
+WUT_CHECK_OFFSET(GX2DispatchParams, 0x00, groupCountX);
+WUT_CHECK_OFFSET(GX2DispatchParams, 0x04, groupCountY);
+WUT_CHECK_OFFSET(GX2DispatchParams, 0x08, groupCountZ);
+WUT_CHECK_OFFSET(GX2DispatchParams, 0x0C, padding);
+WUT_CHECK_SIZE(GX2DispatchParams, 0x10);
 
 struct GX2FetchShader
 {
@@ -118,6 +138,59 @@ WUT_CHECK_OFFSET(GX2AttribVar, 0x04, type);
 WUT_CHECK_OFFSET(GX2AttribVar, 0x08, count);
 WUT_CHECK_OFFSET(GX2AttribVar, 0x0C, location);
 WUT_CHECK_SIZE(GX2AttribVar, 0x10);
+
+struct GX2ComputeShader
+{
+   /* Native compiler register image; not a vertex/pixel register image. */
+   uint32_t regs[12];
+
+   uint32_t size;
+   /* GX2_SHADER_PROGRAM_ALIGNMENT; NULL selects gx2rBuffer instead. */
+   void *program;
+
+   uint32_t uniformBlockCount;
+   GX2UniformBlock *uniformBlocks;
+
+   uint32_t uniformVarCount;
+   GX2UniformVar *uniformVars;
+
+   uint32_t initialValueCount;
+   GX2UniformInitialValue *initialValues;
+
+   uint32_t loopVarCount;
+   GX2LoopVar *loopVars;
+
+   uint32_t samplerVarCount;
+   GX2SamplerVar *samplerVars;
+
+   uint32_t workGroupSizeX;
+   uint32_t workGroupSizeY;
+   uint32_t workGroupSizeZ;
+   BOOL over64Mode;
+   uint32_t wavesPerSimd;
+
+   GX2RBuffer gx2rBuffer;
+};
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x00, regs);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x30, size);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x34, program);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x38, uniformBlockCount);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x3C, uniformBlocks);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x40, uniformVarCount);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x44, uniformVars);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x48, initialValueCount);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x4C, initialValues);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x50, loopVarCount);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x54, loopVars);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x58, samplerVarCount);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x5C, samplerVars);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x60, workGroupSizeX);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x64, workGroupSizeY);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x68, workGroupSizeZ);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x6C, over64Mode);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x70, wavesPerSimd);
+WUT_CHECK_OFFSET(GX2ComputeShader, 0x74, gx2rBuffer);
+WUT_CHECK_SIZE(GX2ComputeShader, 0x84);
 
 struct GX2VertexShader
 {
@@ -388,6 +461,10 @@ GX2SetPixelShader(const GX2PixelShader *shader);
 void
 GX2SetGeometryShader(const GX2GeometryShader *shader);
 
+/** Compute mode shares vertex sampler, texture, uniform-block and loop state. */
+void
+GX2SetComputeShader(const GX2ComputeShader *shader);
+
 void
 GX2SetVertexSampler(const GX2Sampler *sampler,
                     uint32_t id);
@@ -399,6 +476,10 @@ GX2SetPixelSampler(const GX2Sampler *sampler,
 void
 GX2SetGeometrySampler(const GX2Sampler *sampler,
                       uint32_t id);
+
+void
+GX2SetComputeSampler(const GX2Sampler *sampler,
+                     uint32_t id);
 
 void
 GX2SetVertexUniformReg(uint32_t offset,
@@ -424,6 +505,21 @@ void
 GX2SetGeometryUniformBlock(uint32_t location,
                            uint32_t size,
                            const void *data);
+
+void
+GX2SetComputeUniformBlock(uint32_t location,
+                          uint32_t size,
+                          const void *data);
+
+/**
+ * Bind the single global SSBO region shared by all shader stages.
+ * Both address and size must be multiples of GX2_EXPORT_BUFFER_ALIGNMENT.
+ * A zero size disables exports. Changing this binding flushes the GPU and
+ * is not part of context state; retain the binding across dispatches when possible.
+ */
+void
+GX2SetShaderExportBuffer(void *buffer,
+                         uint32_t size);
 
 void
 GX2SetShaderModeEx(GX2ShaderMode mode,
@@ -464,6 +560,19 @@ uint32_t
 GX2GetGeometryShaderStackEntries(const GX2GeometryShader *shader);
 
 static inline GX2UniformBlock *
+GX2GetComputeUniformBlock(const GX2ComputeShader *shader,
+                          const char *name)
+{
+   for (uint32_t i = 0; i < shader->uniformBlockCount; ++i) {
+      if (strcmp(name, shader->uniformBlocks[i].name) == 0) {
+         return &shader->uniformBlocks[i];
+      }
+   }
+
+   return NULL;
+}
+
+static inline GX2UniformBlock *
 GX2GetGeometryUniformBlock(const GX2GeometryShader *shader,
                            const char *name)
 {
@@ -496,6 +605,19 @@ GX2GetVertexUniformBlock(const GX2VertexShader *shader,
    for (uint32_t i = 0; i < shader->uniformBlockCount; ++i) {
       if (strcmp(name, shader->uniformBlocks[i].name) == 0) {
          return &shader->uniformBlocks[i];
+      }
+   }
+
+   return NULL;
+}
+
+static inline GX2UniformVar *
+GX2GetComputeUniformVar(const GX2ComputeShader *shader,
+                        const char *name)
+{
+   for (uint32_t i = 0; i < shader->uniformVarCount; ++i) {
+      if (strcmp(name, shader->uniformVars[i].name) == 0) {
+         return &shader->uniformVars[i];
       }
    }
 

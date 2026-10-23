@@ -1,6 +1,7 @@
 #pragma once
 #include <wut.h>
 #include "enum.h"
+#include "shaders.h"
 
 /**
  * \defgroup gx2_draw Draw
@@ -58,6 +59,15 @@ GX2DrawIndexedImmediateEx(GX2PrimitiveMode mode,
 
 void
 GX2SetPrimitiveRestartIndex(uint32_t index);
+
+/**
+ * Execute groupCountX * groupCountY * groupCountZ compute work-groups.
+ * Every dimension must be nonzero. Each native group contains exactly
+ * GX2_MAX_COMPUTE_WORK_GROUP_SIZE work-items, partitioned by the shader layout.
+ * The GPU reads params asynchronously; see GX2DispatchParams for its lifetime.
+ */
+void
+GX2DispatchCompute(GX2DispatchParams *params);
 
 #ifdef __cplusplus
 }

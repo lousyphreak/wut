@@ -11,27 +11,30 @@
 extern "C" {
 #endif
 
-#define GX2_FALSE                     (0)
-#define GX2_TRUE                      (1)
-#define GX2_DISABLE                   (0)
-#define GX2_ENABLE                    (1)
+#define GX2_FALSE                       (0)
+#define GX2_TRUE                        (1)
+#define GX2_DISABLE                     (0)
+#define GX2_ENABLE                      (1)
 
-#define GX2_COMMAND_BUFFER_ALIGNMENT  (0x40)
-#define GX2_CONTEXT_STATE_ALIGNMENT   (0x100)
-#define GX2_SCAN_BUFFER_ALIGNMENT     (0x1000)
-#define GX2_SHADER_PROGRAM_ALIGNMENT  (0x100)
-#define GX2_VERTEX_BUFFER_ALIGNMENT   (0x40)
-#define GX2_INDEX_BUFFER_ALIGNMENT    (0x20)
-#define GX2_UNIFORM_BLOCK_ALIGNMENT   (0x100)
+#define GX2_COMMAND_BUFFER_ALIGNMENT    (0x40)
+#define GX2_CONTEXT_STATE_ALIGNMENT     (0x100)
+#define GX2_SCAN_BUFFER_ALIGNMENT       (0x1000)
+#define GX2_SHADER_PROGRAM_ALIGNMENT    (0x100)
+#define GX2_VERTEX_BUFFER_ALIGNMENT     (0x40)
+#define GX2_INDEX_BUFFER_ALIGNMENT      (0x20)
+#define GX2_UNIFORM_BLOCK_ALIGNMENT     (0x100)
+#define GX2_DISPATCH_PARAMS_ALIGNMENT   (0x100)
+#define GX2_EXPORT_BUFFER_ALIGNMENT     (0x100)
 
-#define GX2_COMMAND_BUFFER_SIZE       (0x400000)
+#define GX2_COMMAND_BUFFER_SIZE         (0x400000)
 
-#define GX2_MAX_TEXTURE_WIDTH         (8192)
-#define GX2_MAX_TEXTURE_HEIGHT        (8192)
-#define GX2_MAX_TEXTURE_DEPTH         (8192)
-#define GX2_MAX_RENDER_TARGETS        (8)
-#define GX2_MAX_COPY_SURFACE_EX_RECTS (25)
-#define GX2_AUX_BUFFER_CLEAR_VALUE    (0xCC)
+#define GX2_MAX_TEXTURE_WIDTH           (8192)
+#define GX2_MAX_TEXTURE_HEIGHT          (8192)
+#define GX2_MAX_TEXTURE_DEPTH           (8192)
+#define GX2_MAX_RENDER_TARGETS          (8)
+#define GX2_MAX_COMPUTE_WORK_GROUP_SIZE (64)
+#define GX2_MAX_COPY_SURFACE_EX_RECTS   (25)
+#define GX2_AUX_BUFFER_CLEAR_VALUE      (0xCC)
 
 typedef enum GX2AAMode
 {
