@@ -1,5 +1,6 @@
 #pragma once
 #include <wut.h>
+#include <stdarg.h>
 #include "surface.h"
 
 /**
@@ -38,6 +39,14 @@ typedef enum GX2DebugCaptureEndFlags
    //! When set \link GX2DebugCaptureEnd \endlink will NOT call \link GX2Flush \endlink.
    GX2_DEBUG_CAPTURE_END_FLAGS_DISABLE_GX2FLUSH = 1,
 } GX2DebugCaptureEndFlags;
+
+typedef enum GX2DebugTagType
+{
+   GX2_DEBUG_TAG_TYPE_INDENT   = 0,
+   GX2_DEBUG_TAG_TYPE_UNDENT   = 1,
+   GX2_DEBUG_TAG_TYPE_COMMENT  = 2,
+   GX2_DEBUG_TAG_TYPE_BOOKMARK = 3,
+} GX2DebugTagType;
 
 struct GX2DebugCaptureInterface
 {
@@ -96,6 +105,22 @@ WUT_CHECK_OFFSET(GX2DebugCaptureInterface, 0x24, setOutputSurface);
 WUT_CHECK_OFFSET(GX2DebugCaptureInterface, 0x28, onSwapScanBuffers);
 WUT_CHECK_OFFSET(GX2DebugCaptureInterface, 0x2C, submitToRing);
 WUT_CHECK_SIZE(GX2DebugCaptureInterface, 0x30);
+
+/**
+ * Records a formatted tag in the GPU command capture, when capture is active.
+ * The formatted string is limited to 1023 characters.
+ */
+void
+GX2DebugTagUserString(GX2DebugTagType type,
+                      const char *format,
+                      ...)
+   WUT_FORMAT_PRINTF(2, 3);
+
+void
+GX2DebugTagUserStringVA(GX2DebugTagType type,
+                        const char *format,
+                        va_list args)
+   WUT_FORMAT_PRINTF(2, 0);
 
 BOOL
 _GX2DebugSetCaptureInterface(GX2DebugCaptureInterface *interface);
