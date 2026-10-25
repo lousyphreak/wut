@@ -153,13 +153,19 @@ OSSetPerformanceMonitor(uint32_t arg_mask,
 
 /**
  * Convenience function to read from UPMC1.
+ *
+ * Numeric Espresso SPR operands avoid GNU mfupmc aliases for other processors.
+ * Volatile compiler barriers keep snapshots around the measured memory work;
+ * these helpers do not issue a hardware memory fence.
  */
 static inline uint32_t
 OSGetUPMC1()
 {
    uint32_t result;
-   asm("mfupmc1 %[result]"
-       : [result] "=r"(result));
+   __asm__ volatile("mfspr %[result], 937"
+                    : [result] "=r"(result)
+                    :
+                    : "memory");
    return result;
 }
 
@@ -170,8 +176,10 @@ static inline uint32_t
 OSGetUPMC2()
 {
    uint32_t result;
-   asm("mfupmc2 %[result]"
-       : [result] "=r"(result));
+   __asm__ volatile("mfspr %[result], 938"
+                    : [result] "=r"(result)
+                    :
+                    : "memory");
    return result;
 }
 
@@ -182,8 +190,10 @@ static inline uint32_t
 OSGetUPMC3()
 {
    uint32_t result;
-   asm("mfupmc3 %[result]"
-       : [result] "=r"(result));
+   __asm__ volatile("mfspr %[result], 941"
+                    : [result] "=r"(result)
+                    :
+                    : "memory");
    return result;
 }
 
@@ -194,8 +204,10 @@ static inline uint32_t
 OSGetUPMC4()
 {
    uint32_t result;
-   asm("mfupmc4 %[result]"
-       : [result] "=r"(result));
+   __asm__ volatile("mfspr %[result], 942"
+                    : [result] "=r"(result)
+                    :
+                    : "memory");
    return result;
 }
 
