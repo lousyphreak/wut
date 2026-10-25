@@ -1,3 +1,11 @@
+#### Unreleased
+
+###### Fixes and corrections
+* wutdevoptab: Preserve POSIX seek-past-EOF semantics with one logical cursor,
+  positioned I/O, EOF reads and zero-filled write gaps. This prevents sparse
+  cache/header writes from overwriting earlier data when native FSA rejects the
+  requested position.
+
 #### wut 1.7.0
 
 ###### New features / improvements

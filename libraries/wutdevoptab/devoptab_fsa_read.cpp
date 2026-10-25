@@ -51,7 +51,10 @@ __wut_fsa_read(struct _reent *r, void *fd, char *ptr, size_t len)
          size = 0x100000;
       }
 
-      status = FSAReadFile(deviceData->clientHandle, tmp, 1, size, file->fd, 0);
+      status = FSAReadFileWithPos(deviceData->clientHandle, tmp, 1, size, file->offset, file->fd, 0);
+      if (status == FS_ERROR_OUT_OF_RANGE) {
+         return bytesRead; // A logical cursor beyond EOF reads no data.
+      }
 
       if (status < 0) {
          WUT_DEBUG_REPORT("FSAReadFile(0x%08X, %p, 1, 0x%08X, 0x%08X, 0) (%s) failed: %s\n",
