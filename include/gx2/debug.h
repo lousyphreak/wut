@@ -13,6 +13,13 @@
 extern "C" {
 #endif
 
+/** Maximum GPU wait duration in milliseconds. Call from the foreground graphics thread. */
+uint32_t
+GX2GetGPUTimeout(void);
+
+void
+GX2SetGPUTimeout(uint32_t milliseconds);
+
 typedef struct GX2DebugCaptureInterface GX2DebugCaptureInterface;
 
 typedef enum GX2DebugCaptureInterfaceVersion
