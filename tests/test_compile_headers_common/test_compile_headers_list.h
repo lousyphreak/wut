@@ -39,6 +39,8 @@
 #include <padscore.h>
 #include <proc_ui.h>
 #include <sndcore2.h>
+#include <snduser2/axart.h>
+#include <snduser2/axfx.h>
 #include <swkbd/rpl_interface.h>
 #include <sysapp.h>
 #include <tve.h>

@@ -1,0 +1,5 @@
+/**
+ * \defgroup snduser2 snduser2
+ *
+ * Higher-level sound middleware layered on top of AX.
+ */

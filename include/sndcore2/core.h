@@ -131,6 +131,30 @@ uint32_t
 AXGetSwapProfile(AXProfile *profile,
                  uint32_t count);
 
+float
+AXGetPpcLoad(void);
+
+float
+AXGetPpcLoadLimit(void);
+
+float
+AXGetDspLoad(void);
+
+float
+AXGetDspLoadLimit(void);
+
+uint32_t
+AXGetDroppedVoiceCount(void);
+
+int32_t
+AXUserBegin(void);
+
+int32_t
+AXUserEnd(void);
+
+BOOL
+AXUserIsProtected(void);
+
 AXResult
 AXSetDefaultMixerSelect(uint32_t unk0);
 
