@@ -27,6 +27,7 @@ __wut_thread_cleanup(OSThread *thread,
       context->savedCleanup(thread, stack);
    }
 
+   __wut_tls_key_cleanup();
    _reclaim_reent(&context->reent);
 
    // Use global reent during free since the current reent is getting freed

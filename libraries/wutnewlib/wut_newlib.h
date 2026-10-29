@@ -27,6 +27,9 @@ struct _reent *
 __wut_getreent(void);
 
 void
+__wut_tls_key_cleanup(void);
+
+void
 __fini_wut_sbrk_heap();
 
 #endif // ifndef __WUT_NEWLIB_H
