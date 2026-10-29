@@ -96,9 +96,10 @@ SECTIONS
       *(.tdata .tdata.* .gnu.linkonce.td.*)
       *(.tbss .tbss.* .gnu.linkonce.tb.*)
       *(.tcommon)
+      __wut_tls_end = .;
    } > datamem
 
-   .bss ADDR(.thrdata) + SIZEOF(.thrdata) (NOLOAD) : {
+   .bss __wut_tls_end (NOLOAD) : {
       *(.dynsbss)
       *(.sbss .sbss.* .gnu.linkonce.sb.*)
       *(.scommon)

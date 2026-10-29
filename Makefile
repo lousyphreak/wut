@@ -96,6 +96,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 			-I.
 
 .PHONY: all dist-bin dist-src dist install clean
+.PHONY: lib/libwut.a lib/libwutd.a
 
 #---------------------------------------------------------------------------------
 all: lib/libwut.a lib/libwutd.a
@@ -145,6 +146,9 @@ DEPENDS	:=	$(OFILES:.o=.d)
 # main targets
 #---------------------------------------------------------------------------------
 $(OUTPUT)	:	$(OFILES)
+
+# The RPL entry runs with the application's SDA registers.
+crt0_rpl.o: CFLAGS += -fPIC -msdata=none -msecure-plt
 
 $(OFILES_SRC)	: $(HFILES)
 

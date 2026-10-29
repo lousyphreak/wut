@@ -9,3 +9,6 @@
 
 *link:
 %(old_link) -T %:getenv(DEVKITPRO /wut/share/wut.ld) --gc-sections --emit-relocs %{mwiiu-tls:--no-tls-optimize %(wut_tls_exit)} --no-eh-frame-hdr -z nocopyreloc %(wut_entry)
+
+*wut_entry:
+--undefined=__wut_rpx_exports
