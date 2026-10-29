@@ -91,7 +91,14 @@ SECTIONS
       *(.sdata .sdata.* .gnu.linkonce.s.*)
    } > datamem
 
-   .bss (NOLOAD) : {
+   /* The loader copies one aligned TLS template, including zeroed variables. */
+   .thrdata : {
+      *(.tdata .tdata.* .gnu.linkonce.td.*)
+      *(.tbss .tbss.* .gnu.linkonce.tb.*)
+      *(.tcommon)
+   } > datamem
+
+   .bss ADDR(.thrdata) + SIZEOF(.thrdata) (NOLOAD) : {
       *(.dynsbss)
       *(.sbss .sbss.* .gnu.linkonce.sb.*)
       *(.scommon)
