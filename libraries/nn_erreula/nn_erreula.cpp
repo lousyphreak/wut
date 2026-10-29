@@ -110,8 +110,8 @@ Create(const CreateArg &args)
 
    dynloadAcquireUseSize = kWorkMemorySize -
                            MEMGetAllocatableSizeForExpHeapEx(sHeapHandle, 4);
-   OSReport("ERREULA: OSDynLoad_Acquire() use [%d/%d]\n",
-            dynloadAcquireUseSize, kRplAcquireBufferSize);
+   OSReport("ERREULA: OSDynLoad_Acquire() use [%u/%u]\n",
+            unsigned(dynloadAcquireUseSize), unsigned(kRplAcquireBufferSize));
 
    if (dynloadAcquireUseSize > kRplAcquireBufferSize) {
       OSReport("ERREULA: Create failed. dynload_acquire_use_size > kRplAcquireBufferSize.\n");

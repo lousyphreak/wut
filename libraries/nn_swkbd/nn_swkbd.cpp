@@ -128,8 +128,8 @@ Create(const CreateArg &args)
 
    dynloadAcquireUseSize = GetWorkMemorySize(args.unk_0x08) -
                            MEMGetAllocatableSizeForExpHeapEx(sHeapHandle, 4);
-   OSReport("SWKBD: OSDynLoad_Acquire() use [%d/%d]\n",
-            dynloadAcquireUseSize, sRplAcquireBufferSize);
+   OSReport("SWKBD: OSDynLoad_Acquire() use [%u/%u]\n",
+            unsigned(dynloadAcquireUseSize), unsigned(sRplAcquireBufferSize));
 
    if (dynloadAcquireUseSize > sRplAcquireBufferSize) {
       OSReport("SWKBD: Create failed. dynload_acquire_use_size > sRplAcquireBufferSize.\n");
