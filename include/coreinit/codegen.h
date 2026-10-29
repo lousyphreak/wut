@@ -81,15 +81,26 @@ OSGetCodegenMode();
  * \param mode
  * The memory permission mode to use - one of \link OSCodegenSecMode \endlink.
  *
- * \returns
- * \c true on success, or \c false on a failure, such as codegen not being
- * available for this app or CPU core.
+ * The application must enable explicit codegen mode switching, and the calling
+ * thread must run on the core returned by \link OSGetCodegenCore \endlink.
+ * Otherwise, this function leaves the current mode unchanged.
+ * Use \link OSGetSecCodeGenMode \endlink to query the resulting mode.
  */
-BOOL
+void
 OSSwitchSecCodeGenMode(OSCodegenSecMode mode);
 
-//TODO: online docs imply this returns true if codegen is *enabled*, though the
-//name would imply it gets rw/rx status.
+/**
+ * Queries the execution state of a switchable codegen area on the calling core.
+ *
+ * \return
+ * 1 when explicit codegen mode switching is enabled, the calling thread runs on
+ * the designated codegen core, and the area is in \link CODEGEN_R_X \endlink
+ * mode. Returns 0 otherwise, including writable mode, another core, unavailable
+ * codegen, or copy-only codegen mode.
+ *
+ * This does not report general codegen availability. Use
+ * \link OSGetCodegenVirtAddrRange \endlink for that purpose.
+ */
 uint32_t
 OSGetSecCodeGenMode();
 
