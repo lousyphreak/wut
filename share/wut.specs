@@ -4,5 +4,8 @@
 *self_spec:
 %(old_self_spec) -mwiiu-tls
 
+*wut_tls_exit:
+--wrap=__call_exitprocs --undefined=__wrap___call_exitprocs
+
 *link:
-%(old_link) -T %:getenv(DEVKITPRO /wut/share/wut.ld) --gc-sections --emit-relocs %{mwiiu-tls:--no-tls-optimize --wrap=__call_exitprocs --undefined=__wrap___call_exitprocs} --no-eh-frame-hdr -z nocopyreloc %(wut_entry)
+%(old_link) -T %:getenv(DEVKITPRO /wut/share/wut.ld) --gc-sections --emit-relocs %{mwiiu-tls:--no-tls-optimize %(wut_tls_exit)} --no-eh-frame-hdr -z nocopyreloc %(wut_entry)

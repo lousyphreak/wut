@@ -1,6 +1,7 @@
 #include "wut_newlib.h"
 #include "wut_thread_specific.h"
 
+#include <coreinit/dynload.h>
 #include <limits.h>
 #include <pthread.h>
 #include <stdlib.h>
@@ -103,6 +104,7 @@ struct WUTTLSDestructor
    void (*destructor)(void *);
    void *object;
    struct WUTTLSDestructor *next;
+   OSDynLoad_Module module;
 };
 
 static pthread_key_t sDestructorKey;
@@ -116,7 +118,11 @@ __wut_run_tls_destructors(void *head)
    while ((entry = pthread_getspecific(sDestructorKey))) {
       pthread_setspecific(sDestructorKey, entry->next);
       entry->destructor(entry->object);
+      OSDynLoad_Module module = entry->module;
       free(entry);
+      if (module) {
+         OSDynLoad_Release(module);
+      }
    }
 }
 
@@ -129,16 +135,23 @@ __wut_init_tls_destructors(void)
 int
 __cxa_thread_atexit(void (*destructor)(void *), void *object, void *dso)
 {
-   (void)dso;
    pthread_once(&sDestructorOnce, __wut_init_tls_destructors);
    struct WUTTLSDestructor *entry = malloc(sizeof(*entry));
    if (!entry) {
       return -1;
    }
-   *entry = (struct WUTTLSDestructor){destructor, object, pthread_getspecific(sDestructorKey)};
+   OSDynLoad_Module module = NULL;
+   if (dso && OSDynLoad_AcquireContainingModule(dso, OS_DYNLOAD_SECTION_DATA, &module)) {
+      free(entry);
+      return -1;
+   }
+   *entry = (struct WUTTLSDestructor){destructor, object, pthread_getspecific(sDestructorKey), module};
    int result = pthread_setspecific(sDestructorKey, entry);
    if (result) {
       free(entry);
+      if (module) {
+         OSDynLoad_Release(module);
+      }
    }
    return result;
 }

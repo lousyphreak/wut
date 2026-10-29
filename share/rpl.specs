@@ -1,2 +1,11 @@
 *wut_entry:
 --entry=__rpl_start
+
+*wut_tls_exit:
+
+
+*startfile:
+ecrti.o%s crtbeginS.o%s
+
+*endfile:
+crtendS.o%s ecrtn.o%s

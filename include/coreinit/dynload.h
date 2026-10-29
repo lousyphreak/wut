@@ -45,6 +45,13 @@ typedef enum OSDynLoad_ExportType
    OS_DYNLOAD_EXPORT_DATA = 1,
 } OSDynLoad_ExportType;
 
+typedef enum OSDynLoad_SectionType
+{
+   OS_DYNLOAD_SECTION_ANY  = 0,
+   OS_DYNLOAD_SECTION_CODE = 1,
+   OS_DYNLOAD_SECTION_DATA = 2,
+} OSDynLoad_SectionType;
+
 typedef enum OSDynLoad_EntryReason
 {
    OS_DYNLOAD_LOADED   = 1,
@@ -218,6 +225,15 @@ typedef void (*OSDynLoadNotifyFunc)(OSDynLoad_Module module,
 OSDynLoad_Error
 OSDynLoad_Acquire(char const *name,
                   OSDynLoad_Module *outModule);
+
+/**
+ * Acquire the module containing a code or static-data address.
+ * The returned handle owns a reference, released with OSDynLoad_Release.
+ */
+OSDynLoad_Error
+OSDynLoad_AcquireContainingModule(const void *addr,
+                                 OSDynLoad_SectionType sectionType,
+                                 OSDynLoad_Module *outModule);
 
 
 /**
